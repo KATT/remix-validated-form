@@ -1,7 +1,7 @@
 import { TestFormData } from "@remix-validated-form/test-utils";
-import { describe, it, expect, beforeEach, afterEach } from "vitest";
+import { describe, it, expect, beforeEach, afterEach, expectTypeOf } from "vitest";
 import { z } from "zod";
-import { zfd } from "./";
+import { TypedFormData, zfd } from "./";
 
 const expectError = (schema: z.Schema<any>, val: any) => {
   expect(schema.safeParse(val)).toMatchObject({
@@ -368,5 +368,19 @@ describe("zod helpers", () => {
         checkboxGroup: ["value1", "value2"],
       });
     });
+  });
+
+  it("should have typed formdata", () => {
+    const s = zfd.formData({
+      number: zfd.numeric(),
+      text: zfd.text(),
+      repeatable: zfd.repeatable(zfd.text()),
+    });
+    type Input = typeof s["_input"];
+    type TypedInput = Input extends TypedFormData<infer TInput>
+      ? TInput
+      : never;
+
+    expectTypeOf<Input>().toMatchTypeOf<{}>()
   });
 });
