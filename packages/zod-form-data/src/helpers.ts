@@ -119,11 +119,15 @@ type FormDataLikeInput = {
   entries(): IterableIterator<[string, FormDataEntryValue]>;
 };
 
+export type TypedFormData<T> = FormData & {
+  _input: T;
+}
+
 type FormDataType = {
   <T extends z.ZodRawShape>(shape: T): ZodEffects<
     ZodObject<T>,
     z.output<ZodObject<T>>,
-    FormData | FormDataLikeInput
+    FormData | FormDataLikeInput | TypedFormData<z.input<ZodObject<T>>>
   >;
   <T extends z.ZodTypeAny>(schema: T): ZodEffects<
     T,
